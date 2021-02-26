@@ -19,6 +19,7 @@ resource "null_resource" "save_key_pair"  {
   }
 }
 
+# Saving Key Pair for ssh login for Client if needed
 resource "local_file" "foo" {
   content     = tls_private_key.my_key.private_key_pem
   filename = "${path.module}/ssh_key.pem"
@@ -72,29 +73,11 @@ data "aws_ami" "amazon-linux-2" {
 }
 
 resource "aws_instance" "web" {
-  ami           = data.aws_ami.amazon-linux-2.id
+  ami           = "ami-0749ff158d82fc5ee"
   instance_type = "t2.micro"
-  user_data     = file("init-script.sh")
+  #user_data     = file("init-script.sh")
   key_name      = aws_key_pair.deployer.key_name
-  vpc_security_group_ids = [aws_security_group.web-sg.id]
-}
-
-### efs
-resource "aws_efs_file_system" "efs" {
-  creation_token   = "EFS Shared Data"
-  performance_mode = "generalPurpose"
-}
-resource "aws_efs_mount_target" "efs" {
-  file_system_id  = aws_efs_file_system.efs.id
-  subnet_id       = aws_instance.web.subnet_id
-  security_groups = [aws_security_group.web-sg.id]
-}
-
-data "template_file" "script" {
-  template = file("script.tpl")
-  vars = {
-    efs_id = aws_efs_file_system.efs.id
-  }
+  vpc_security_group_ids = ["sg-014e2d5e6662b6859", aws_security_group.web-sg.id]
 }
 
 ### output

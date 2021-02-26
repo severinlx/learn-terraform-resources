@@ -1,5 +1,4 @@
 #!/bin/bash
-sleep 5m
 echo "im in the bash file"
 sudo su - root
 # Install AWS EFS Utilities

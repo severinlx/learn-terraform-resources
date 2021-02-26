@@ -1,16 +1,15 @@
 #!/bin/bash
-yum update -y
-yum -y remove httpd
-yum -y remove httpd-tools
-yum install -y httpd24 php72 mysql57-server php72-mysqlnd
-service httpd start
-chkconfig httpd on
+echo "im in the bash file"
+sudo su - root
+# Install AWS EFS Utilities
+yum install -y amazon-efs-utils
+# Mount EFS
+mkdir /efs
+efs_id="fs-3e677566:" #"${efs_id}"
+mount -t efs $efs_id:/ /efs
+# Edit fstab so EFS automatically loads on reboot
+echo $efs_id:/ /efs efs defaults,_netdev 0 0 >> /etc/fstab
 
-usermod -a -G apache ec2-user
-chown -R ec2-user:apache /var/www
-chmod 2775 /var/www
-find /var/www -type d -exec chmod 2775 {} \;
-find /var/www -type f -exec chmod 0664 {} \;
-cd /var/www/html
-curl http://169.254.169.254/latest/meta-data/instance-id -o index.html
-curl https://raw.githubusercontent.com/hashicorp/learn-terramino/master/index.php -O
+#sqllite, to work with the db, its either installed or should be installed by
+#yum install -y sqlite3 libsqlite3-dev
+#  yum list | grep sqlite and choose packet to install
